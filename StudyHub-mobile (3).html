@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#059669">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="StudyHub">
+  <title>StudyHub</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7f5;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --brand: #059669;
+      --brand-dark: #047857;
+      --brand-soft: #d1fae5;
+      --admin: #7e22ce;
+      --danger: #dc2626;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+    }
+    html.dark {
+      color-scheme: dark;
+      --bg: #020617;
+      --card: #0f172a;
+      --ink: #f8fafc;
+      --muted: #94a3b8;
+      --line: #1e293b;
+      --brand-soft: #064e3b;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100dvh;
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .app { width: min(100%, 520px); margin: 0 auto; min-height: 100dvh; padding-bottom: calc(84px + var(--safe-bot)); }
+    .banner { display: flex; gap: 10px; align-items: center; padding: 12px 14px; color: white; }
+    .banner.emerald { background: linear-gradient(90deg, #059669, #0d9488, #0891b2); }
+    .banner.gold { background: linear-gradient(90deg, #f59e0b, #f97316, #d97706); }
+    .banner.blue { background: linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed); }
+    .banner.purple { background: linear-gradient(90deg, #9333ea, #7e22ce, #3730a3); }
+    .badge { background: rgba(255,255,255,.22); border-radius: 999px; padding: 4px 8px; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+    .banner p { margin: 0; font-size: 13px; font-weight: 650; flex: 1; }
+    .banner button { border: 0; background: white; color: #047857; border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 800; }
+    .icon-btn { border: 0; background: transparent; color: inherit; width: 40px; height: 40px; border-radius: 12px; }
+    header.top {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      background: color-mix(in srgb, var(--card) 88%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; gap: 10px; align-items: center; background: none; border: 0; padding: 0; text-align: left; }
+    .logo { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(160deg, #10b981, #047857); color: white; font-weight: 900; }
+    .brand b { display: block; font-size: 20px; letter-spacing: -0.03em; }
+    .brand b span { color: var(--brand); }
+    .brand small { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    main { padding: 16px; display: grid; gap: 14px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 16px; box-shadow: var(--shadow); }
+    h1 { font-size: 28px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.04em; }
+    h2 { font-size: 20px; margin: 0 0 8px; letter-spacing: -0.03em; }
+    .muted { color: var(--muted); font-size: 13px; margin: 0; }
+    .tabs, .subtabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: color-mix(in srgb, var(--line) 65%, var(--card)); padding: 5px; border-radius: 16px; }
+    .tabs button, .subtabs button, .nav button, .primary, .ghost, .opt, .exam {
+      border: 0; border-radius: 14px;
+    }
+    .tabs button, .subtabs button { background: transparent; padding: 12px 8px; font-weight: 800; color: var(--muted); }
+    .tabs button.on, .subtabs button.on { background: var(--card); color: var(--brand); box-shadow: var(--shadow); }
+    label { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 12px 0 6px; }
+    input, select, textarea {
+      width: 100%; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 70%, var(--card));
+      border-radius: 14px; padding: 14px 12px; font-size: 16px;
+    }
+    textarea { min-height: 88px; resize: vertical; }
+    .primary { width: 100%; margin-top: 14px; background: linear-gradient(90deg, #10b981, #047857); color: white; font-weight: 800; padding: 15px; }
+    .primary.admin { background: linear-gradient(90deg, #9333ea, #6b21a8); }
+    .ghost { background: transparent; border: 1px solid var(--line) !important; padding: 14px; font-weight: 800; }
+    .row { display: flex; gap: 8px; }
+    .row > * { flex: 1; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat { background: var(--bg); border-radius: 16px; padding: 12px; }
+    .stat b { display: block; font-size: 28px; letter-spacing: -0.04em; }
+    .stat span, .exam small { color: var(--muted); font-size: 12px; }
+    .exam { display: block; width: 100%; text-align: left; background: var(--card); border: 1px solid var(--line) !important; padding: 14px; margin-top: 8px; }
+    .exam strong { display: block; font-size: 16px; }
+    .exam .count { float: right; background: var(--bg); border-radius: 999px; padding: 4px 8px; font-size: 12px; font-weight: 800; }
+    .target { outline: 2px solid var(--brand); }
+    .bars { display: grid; gap: 8px; }
+    .bar { display: grid; grid-template-columns: 72px 1fr 42px; gap: 8px; align-items: center; font-size: 12px; font-weight: 700; }
+    .track { height: 10px; background: var(--bg); border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; background: var(--brand); }
+    .history { display: grid; gap: 8px; }
+    .history div { display: flex; justify-content: space-between; gap: 8px; background: var(--bg); border-radius: 14px; padding: 10px 12px; font-size: 13px; }
+    .qhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .pill { background: #fef3c7; color: #92400e; border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 800; }
+    html.dark .pill { background: #451a03; color: #fcd34d; }
+    .opt { display: block; width: 100%; text-align: left; margin-top: 8px; padding: 14px; background: var(--bg); border: 1px solid var(--line) !important; font-weight: 650; }
+    .opt.on { border-color: var(--brand) !important; background: var(--brand-soft); }
+    .opt.good { border-color: #059669 !important; background: #d1fae5; }
+    .opt.bad { border-color: #dc2626 !important; background: #fee2e2; }
+    .explain { margin-top: 10px; padding: 12px; border-radius: 14px; background: var(--bg); font-size: 14px; }
+    .fc { min-height: 280px; display: flex; flex-direction: column; justify-content: space-between; }
+    .fc.flipped { outline: 2px solid var(--brand); }
+    nav.dock {
+      position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: min(100%, 520px);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--line);
+      padding: 6px 8px calc(8px + var(--safe-bot));
+      z-index: 30;
+    }
+    nav.dock button { background: transparent; color: var(--muted); font-size: 11px; font-weight: 800; padding: 8px 4px; }
+    nav.dock button.on { color: var(--brand); }
+    .toast {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(88px + var(--safe-bot)); z-index: 40;
+      width: min(92%, 480px); background: #0f172a; color: white;
+      border-radius: 16px; padding: 12px 14px; font-size: 14px; font-weight: 700;
+    }
+    .toast.success { background: #059669; }
+    .toast.error { background: #dc2626; }
+    .hidden { display: none !important; }
+    .note { font-size: 13px; background: #f5f3ff; color: #5b21b6; border-radius: 14px; padding: 12px; }
+    html.dark .note { background: #2e1065; color: #e9d5ff; }
+    .qitem { border-top: 1px solid var(--line); padding: 12px 0; }
+    .qitem p { margin: 0 0 8px; font-weight: 700; }
+    .mini { display: flex; gap: 8px; }
+    .mini button { border: 0; border-radius: 10px; padding: 8px 10px; font-weight: 800; background: var(--bg); }
+    .danger { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div id="banner" class="banner emerald">
+      <span id="adBadge" class="badge">Offer</span>
+      <p id="adText"></p>
+      <button id="adBtn" type="button">Open</button>
+      <button id="adClose" class="icon-btn" type="button" aria-label="Dismiss">✕</button>
+    </div>
+    <header class="top">
+      <button class="brand" id="homeBtn" type="button">
+        <span class="logo">S</span>
+        <span><b>Study<span>Hub</span></b><small>Exam prep</small></span>
+      </button>
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle theme">☾</button>
+    </header>
+    <main>
+      <section id="auth" class="card">
+        <h1>Portal access</h1>
+        <p class="muted">Student or admin. Your data stays on this phone.</p>
+        <div class="tabs" style="margin-top:14px">
+          <button id="tabStudent" class="on" type="button">Student</button>
+          <button id="tabAdmin" type="button">Admin</button>
+        </div>
+        <form id="studentForm">
+          <div class="subtabs" style="margin-top:12px">
+            <button id="subLogin" class="on" type="button">Log in</button>
+            <button id="subSignup" type="button">Register</button>
+          </div>
+          <div id="nameWrap" class="hidden">
+            <label for="sName">Full name</label>
+            <input id="sName" autocomplete="name" placeholder="Alex Morgan">
+          </div>
+          <label for="sEmail">Email</label>
+          <input id="sEmail" type="email" autocomplete="username" required placeholder="student@example.com">
+          <label for="sPass">Password</label>
+          <input id="sPass" type="password" autocomplete="current-password" required placeholder="At least 6 characters">
+          <div id="examWrap" class="hidden">
+            <label for="sExam">Target exam</label>
+            <select id="sExam"></select>
+          </div>
+          <button class="primary" id="sSubmit" type="submit">Log in</button>
+        </form>
+        <form id="adminForm" class="hidden">
+          <p class="note">Administrator sign-in. It stays on this phone only.</p>
+          <label for="aEmail">Admin email</label>
+          <input id="aEmail" type="email" autocomplete="username" required placeholder="allnone1403@gmail.com">
+          <label for="aPass">Password</label>
+          <input id="aPass" type="password" autocomplete="current-password" required>
+          <button class="primary admin" type="submit">Open admin console</button>
+        </form>
+      </section>
+
+      <section id="dashboard" class="hidden">
+        <div class="card">
+          <h1 id="hello">Welcome</h1>
+          <p class="muted">Pick an exam. Your target exam is listed first.</p>
+          <div class="stats" style="margin-top:14px">
+            <div class="stat"><span>Tests</span><b id="statTests">0</b></div>
+            <div class="stat"><span>Average</span><b id="statAvg">0%</b></div>
+          </div>
+        </div>
+        <div id="exams"></div>
+        <div class="card">
+          <h2>Recent accuracy</h2>
+          <div id="chart" class="bars"></div>
+          <div id="log" class="history" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="quiz" class="hidden">
+        <div class="card">
+          <div class="qhead">
+            <h2 id="quizTitle">Practice</h2>
+            <span id="timer" class="pill">10:00</span>
+          </div>
+          <p id="quizProgress" class="muted"></p>
+          <div id="quizBody"></div>
+          <div class="row" style="margin-top:12px">
+            <button id="prevQ" class="ghost" type="button">Previous</button>
+            <button id="nextQ" class="ghost" type="button">Next</button>
+          </div>
+          <button id="submitQuiz" class="primary" type="button">Submit test</button>
+          <button id="quitQuiz" class="ghost" type="button" style="width:100%;margin-top:8px">Quit without saving</button>
+        </div>
+      </section>
+
+      <section id="cards" class="hidden">
+        <div class="card fc" id="fcCard">
+          <div class="qhead"><span id="fcMeta" class="muted"></span><span id="fcCount" class="muted"></span></div>
+          <h2 id="fcText">No cards yet</h2>
+          <p id="fcHint" class="muted">Tap the card to flip it.</p>
+        </div>
+        <div class="row">
+          <button id="fcPrev" class="ghost" type="button">Previous</button>
+          <button id="fcNext" class="primary" type="button" style="margin-top:0">Next</button>
+        </div>
+      </section>
+
+      <section id="admin" class="hidden">
+        <div class="card">
+          <h1>Admin</h1>
+          <div class="subtabs">
+            <button id="admQ" class="on" type="button">Questions</button>
+            <button id="admA" type="button">Banner</button>
+          </div>
+        </div>
+        <form id="qForm" class="card">
+          <h2 id="qHeading">Add question</h2>
+          <label for="qExam">Exam</label>
+          <select id="qExam"></select>
+          <label for="qSubject">Subject</label>
+          <input id="qSubject" required placeholder="Organic Chemistry">
+          <label for="qText">Question</label>
+          <textarea id="qText" required></textarea>
+          <label for="q0">Option A</label><input id="q0" required>
+          <label for="q1">Option B</label><input id="q1" required>
+          <label for="q2">Option C</label><input id="q2" required>
+          <label for="q3">Option D</label><input id="q3" required>
+          <label for="qCorrect">Correct option</label>
+          <select id="qCorrect"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+          <label for="qExp">Explanation</label>
+          <textarea id="qExp" required></textarea>
+          <button class="primary admin" type="submit">Save question</button>
+          <button id="qCancel" class="ghost hidden" type="button" style="width:100%;margin-top:8px">Cancel edit</button>
+        </form>
+        <div class="card">
+          <label for="qFilter">Filter</label>
+          <select id="qFilter"></select>
+          <div id="qList"></div>
+        </div>
+        <form id="adForm" class="card hidden">
+          <h2>Banner</h2>
+          <label for="adBadgeIn">Badge</label><input id="adBadgeIn" required>
+          <label for="adTextIn">Headline</label><input id="adTextIn" required>
+          <label for="adBtnIn">Button</label><input id="adBtnIn" required>
+          <label for="adMsgIn">Message when tapped</label><input id="adMsgIn" required>
+          <label for="adTheme">Color</label>
+          <select id="adTheme">
+            <option value="emerald">Emerald</option>
+            <option value="gold">Gold</option>
+            <option value="blue">Blue</option>
+            <option value="purple">Purple</option>
+          </select>
+          <label><input id="adVisible" type="checkbox" style="width:auto"> Show banner</label>
+          <button class="primary admin" type="submit">Save banner</button>
+        </form>
+      </section>
+
+      <section id="profile" class="hidden">
+        <form id="profForm" class="card">
+          <h1 id="profTitle">Profile</h1>
+          <p id="profRole" class="muted"></p>
+          <label for="pName">Name</label>
+          <input id="pName" required>
+          <label for="pEmail">Email</label>
+          <input id="pEmail" type="email" readonly>
+          <div id="pExamWrap">
+            <label for="pExam">Target exam</label>
+            <select id="pExam"></select>
+          </div>
+          <button class="primary" type="submit">Save</button>
+          <button id="logoutBtn" class="ghost danger" type="button" style="width:100%;margin-top:8px">Log out</button>
+        </form>
+      </section>
+    </main>
+    <nav id="dock" class="dock hidden">
+      <button id="navHome" type="button">Home</button>
+      <button id="navCards" type="button">Cards</button>
+      <button id="navAdmin" type="button">Admin</button>
+      <button id="navProfile" type="button">Profile</button>
+    </nav>
+  </div>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script>
+    const EXAMS = ["JEE", "NEET", "UPSC", "SSC", "Banking", "GATE"];
+    const EXAM_INFO = {
+      JEE: ["JEE Main & Advanced", "Physics, Chemistry, and Mathematics."],
+      NEET: ["NEET Medical", "Biology, Chemistry, and Physics."],
+      UPSC: ["UPSC Civil Services", "Polity, history, and current affairs."],
+      SSC: ["SSC CGL / CHSL", "Reasoning, quant, English, and GK."],
+      Banking: ["Banking (IBPS & SBI)", "Numerical ability and financial awareness."],
+      GATE: ["GATE Engineering", "Engineering maths and technical aptitude."]
+    };
+    const SEED = [
+      { id: "q1", exam: "JEE", subject: "Chemistry", question: "What is the oxidation state of Fe in Fe3O4?", options: ["+2", "+3", "+8/3", "0"], correct: 2, exp: "Fe3O4 is a mixed oxide (FeO + Fe2O3). Average oxidation state is +8/3." },
+      { id: "q2", exam: "JEE", subject: "Physics", question: "Which of the following represents the SI unit of Electric Field strength?", options: ["N/C", "Joule", "Watt", "Tesla"], correct: 0, exp: "Electric Field E = F/q, so the unit is newtons per coulomb (N/C)." },
+      { id: "q3", exam: "NEET", subject: "Biology", question: "Which organelle is known as the powerhouse of the cell?", options: ["Mitochondria", "Ribosome", "Golgi Body", "Nucleus"], correct: 0, exp: "Mitochondria synthesize cellular energy as ATP." },
+      { id: "q4", exam: "NEET", subject: "Chemistry", question: "What is the pH of pure water at 25°C?", options: ["0", "7", "14", "1"], correct: 1, exp: "Pure water is neutral at room temperature, so pH is 7." },
+      { id: "q5", exam: "UPSC", subject: "Polity", question: "Which Article of the Indian Constitution guarantees Equality Before Law?", options: ["Article 14", "Article 21", "Article 32", "Article 44"], correct: 0, exp: "Article 14 guarantees equality before law and equal protection of the laws." },
+      { id: "q6", exam: "SSC", subject: "GK", question: "Where are the headquarters of the Reserve Bank of India located?", options: ["New Delhi", "Mumbai", "Kolkata", "Chennai"], correct: 1, exp: "The RBI headquarters are in Mumbai." },
+      { id: "q7", exam: "Banking", subject: "Finance", question: "What is Repo Rate?", options: ["Rate at which RBI lends money to commercial banks", "Rate at which banks lend to the public", "Tax rate", "Savings rate"], correct: 0, exp: "Repo rate is the rate at which the central bank lends to commercial banks." },
+      { id: "q8", exam: "GATE", subject: "CS", question: "What is the worst-case time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n log n)", "O(1)"], correct: 1, exp: "Binary search halves the search interval each step, so it is O(log n)." }
+    ];
+    const ADMIN_EMAIL = "allnone1403@gmail.com";
+    const ADMIN_HASH = "f18bb468e7188dfd38c22a168423693bb2d1acfdc430e9e326f5570f1fba871a";
+    const DEFAULT_AD = { badge: "Special Offer", text: "StudyHub Flash Sale: Unlimited mock tests for JEE, NEET and UPSC 2026.", btnText: "Enroll", actionMsg: "Use code STUDYHUB2026 for 50% off practice passes.", theme: "emerald", visible: true };
+
+    const $ = (id) => document.getElementById(id);
+    let session = null;
+    let questions = [];
+    let quiz = null;
+    let timerId = null;
+    let submitted = false;
+    let fcIndex = 0;
+    let fcFlip = false;
+    let editId = "";
+    let signup = false;
+
+    function load(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw == null ? fallback : JSON.parse(raw);
+      } catch { return fallback; }
+    }
+    function save(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+      catch { toast("This phone blocked saving.", "error"); return false; }
+    }
+    function toast(message, type) {
+      const el = $("toast");
+      el.textContent = message;
+      el.className = "toast" + (type ? " " + type : "");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.add("hidden"), 2800);
+    }
+    function sha256(text) {
+      const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+      const k = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+      const bytes = new TextEncoder().encode(text);
+      const bitLen = bytes.length * 8;
+      const withPad = new Uint8Array(((bytes.length + 9 + 63) >> 6) << 6);
+      withPad.set(bytes);
+      withPad[bytes.length] = 0x80;
+      const view = new DataView(withPad.buffer);
+      view.setUint32(withPad.length - 4, bitLen >>> 0);
+      view.setUint32(withPad.length - 8, Math.floor(bitLen / 0x100000000));
+      let h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a, h4 = 0x510e527f, h5 = 0x9b05688c, h6 = 0x1f83d9ab, h7 = 0x5be0cd19;
+      const w = new Uint32Array(64);
+      for (let i = 0; i < withPad.length; i += 64) {
+        for (let t = 0; t < 16; t++) w[t] = view.getUint32(i + t * 4);
+        for (let t = 16; t < 64; t++) {
+          const s0 = rotr(w[t - 15], 7) ^ rotr(w[t - 15], 18) ^ (w[t - 15] >>> 3);
+          const s1 = rotr(w[t - 2], 17) ^ rotr(w[t - 2], 19) ^ (w[t - 2] >>> 10);
+          w[t] = (w[t - 16] + s0 + w[t - 7] + s1) >>> 0;
+        }
+        let a = h0, b = h1, c = h2, d = h3, e = h4, f = h5, g = h6, h = h7;
+        for (let t = 0; t < 64; t++) {
+          const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+          const ch = (e & f) ^ (~e & g);
+          const t1 = (h + S1 + ch + k[t] + w[t]) >>> 0;
+          const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+          const maj = (a & b) ^ (a & c) ^ (b & c);
+          const t2 = (S0 + maj) >>> 0;
+          h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+        }
+        h0 = (h0 + a) >>> 0; h1 = (h1 + b) >>> 0; h2 = (h2 + c) >>> 0; h3 = (h3 + d) >>> 0;
+        h4 = (h4 + e) >>> 0; h5 = (h5 + f) >>> 0; h6 = (h6 + g) >>> 0; h7 = (h7 + h) >>> 0;
+      }
+      return [h0, h1, h2, h3, h4, h5, h6, h7].map((n) => n.toString(16).padStart(8, "0")).join("");
+    }
+    function fillSelect(select, includeAll) {
+      select.replaceChildren();
+      if (includeAll) select.add(new Option("All exams", "ALL"));
+      EXAMS.forEach((exam) => select.add(new Option(EXAM_INFO[exam][0], exam)));
+    }
+    function historyKey() { return session ? "quizHistoryByUser:" + session.email : ""; }
+    function readHistory() { return session && session.role === "student" ? load(historyKey(), []) : []; }
+    function pct(score, total) { return total > 0 ? Math.round((score / total) * 100) : 0; }
+    function show(id) {
+      ["auth", "dashboard", "quiz", "cards", "admin", "profile"].forEach((name) => $(name).classList.toggle("hidden", name !== id));
+      $("dock").classList.toggle("hidden", !session);
+      $("navAdmin").classList.toggle("hidden", !session || session.role !== "admin");
+      ["navHome", "navCards", "navAdmin", "navProfile"].forEach((btn) => $(btn).classList.remove("on"));
+      const map = { dashboard: "navHome", cards: "navCards", admin: "navAdmin", profile: "navProfile" };
+      if (map[id]) $(map[id]).classList.add("on");
+      if (id === "dashboard") renderDashboard();
+      if (id === "cards") renderCard();
+      if (id === "admin") renderAdmin();
+      if (id === "profile") renderProfile();
+    }
+    function goHome() { show(session ? "dashboard" : "auth"); }
+    function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+    function renderBanner() {
+      const ad = Object.assign({}, DEFAULT_AD, load("adConfig", DEFAULT_AD));
+      const dismissed = sessionStorage.getItem("adDismissed") === "1";
+      $("banner").classList.toggle("hidden", !ad.visible || dismissed);
+      $("banner").className = "banner " + (ad.theme || "emerald") + ((!ad.visible || dismissed) ? " hidden" : "");
+      $("adBadge").textContent = ad.badge || "Offer";
+      $("adText").textContent = ad.text || "";
+      $("adBtn").textContent = ad.btnText || "Open";
+      $("adBtn").onclick = () => toast(ad.actionMsg || "");
+    }
+    function renderDashboard() {
+      const name = session.role === "admin" ? "Admin" : (session.name || "Student");
+      $("hello").textContent = "Hi, " + name;
+      const history = readHistory();
+      $("statTests").textContent = String(history.length);
+      const valid = history.filter((item) => item.total > 0);
+      const avg = valid.length ? Math.round(valid.reduce((sum, item) => sum + item.score / item.total, 0) / valid.length * 100) : 0;
+      $("statAvg").textContent = avg + "%";
+      const counts = Object.fromEntries(EXAMS.map((exam) => [exam, 0]));
+      questions.forEach((q) => { if (counts[q.exam] != null) counts[q.exam]++; });
+      const order = EXAMS.slice().sort((a, b) => (a === session.targetExam ? -1 : b === session.targetExam ? 1 : 0));
+      const wrap = $("exams");
+      wrap.replaceChildren();
+      order.forEach((exam) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "exam" + (exam === session.targetExam ? " target" : "");
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = counts[exam] + " Qs";
+        const title = document.createElement("strong");
+        title.textContent = EXAM_INFO[exam][0];
+        const blurb = document.createElement("small");
+        blurb.textContent = EXAM_INFO[exam][1];
+        btn.append(count, title, blurb);
+        btn.onclick = () => startQuiz(exam);
+        wrap.append(btn);
+      });
+      const chart = $("chart");
+      chart.replaceChildren();
+      const recent = history.slice(-6);
+      if (!recent.length) {
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.textContent = "Finish a test to see your scores.";
+        chart.append(empty);
+      }
+      recent.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "bar";
+        const label = document.createElement("span");
+        label.textContent = "#" + (history.length - recent.length + index + 1) + " " + item.exam;
+        const track = document.createElement("div");
+        track.className = "track";
+        const fill = document.createElement("div");
+        fill.className = "fill";
+        const value = pct(item.score, item.total);
+        fill.style.width = value + "%";
+        track.append(fill);
+        const num = document.createElement("span");
+        num.textContent = value + "%";
+        row.append(label, track, num);
+        chart.append(row);
+      });
+      const log = $("log");
+      log.replaceChildren();
+      history.slice().reverse().slice(0, 6).forEach((item) => {
+        const row = document.createElement("div");
+        const left = document.createElement("span");
+        left.textContent = item.exam + " · " + item.date;
+        const right = document.createElement("b");
+        right.textContent = item.score + "/" + item.total;
+        row.append(left, right);
+        log.append(row);
+      });
+    }
+    function startQuiz(exam) {
+      stopTimer();
+      submitted = false;
+      const list = questions.filter((q) => q.exam === exam);
+      quiz = { exam, list, index: 0, answers: {}, seconds: 600 };
+      $("quizTitle").textContent = EXAM_INFO[exam][0];
+      $("submitQuiz").disabled = list.length === 0;
+      show("quiz");
+      renderQuestion();
+      if (!list.length) return;
+      const tick = () => {
+        const m = String(Math.floor(quiz.seconds / 60)).padStart(2, "0");
+        const s = String(quiz.seconds % 60).padStart(2, "0");
+        $("timer").textContent = m + ":" + s;
+        if (quiz.seconds <= 0) { stopTimer(); toast("Time is up. Submitting.", "error"); finishQuiz(); return; }
+        quiz.seconds -= 1;
+      };
+      tick();
+      timerId = setInterval(tick, 1000);
+    }
+    function renderQuestion() {
+      const body = $("quizBody");
+      body.replaceChildren();
+      if (!quiz || !quiz.list.length) {
+        const p = document.createElement("p");
+        p.textContent = "No questions in this exam yet. An admin can add some.";
+        body.append(p);
+        $("quizProgress").textContent = "";
+        return;
+      }
+      const q = quiz.list[quiz.index];
+      $("quizProgress").textContent = "Question " + (quiz.index + 1) + " of " + quiz.list.length + " · " + q.subject;
+      const prompt = document.createElement("h2");
+      prompt.textContent = q.question;
+      body.append(prompt);
+      q.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "opt";
+        btn.textContent = String.fromCharCode(65 + index) + ". " + option;
+        const chosen = quiz.answers[quiz.index];
+        if (submitted) {
+          btn.disabled = true;
+          if (index === q.correct) btn.classList.add("good");
+          else if (index === chosen) btn.classList.add("bad");
+        } else if (chosen === index) btn.classList.add("on");
+        btn.onclick = () => { if (submitted) return; quiz.answers[quiz.index] = index; renderQuestion(); };
+        body.append(btn);
+      });
+      if (submitted) {
+        const note = document.createElement("p");
+        note.className = "explain";
+        const chosen = quiz.answers[quiz.index];
+        note.textContent = (chosen === q.correct ? "Correct. " : "Answer: " + String.fromCharCode(65 + q.correct) + ". ") + q.exp;
+        body.append(note);
+      }
+      $("prevQ").disabled = quiz.index === 0;
+      $("nextQ").disabled = quiz.index >= quiz.list.length - 1;
+    }
+    function finishQuiz() {
+      if (!quiz || submitted) return;
+      if (!quiz.list.length) return;
+      submitted = true;
+      stopTimer();
+      let score = 0;
+      quiz.list.forEach((q, index) => { if (quiz.answers[index] === q.correct) score++; });
+      const history = readHistory();
+      history.push({ exam: quiz.exam, score, total: quiz.list.length, date: new Date().toLocaleString([], { hour: "2-digit", minute: "2-digit" }) });
+      save(historyKey(), history);
+      toast("Score " + score + "/" + quiz.list.length, "success");
+      $("submitQuiz").disabled = true;
+      renderQuestion();
+    }
+    function renderCard() {
+      const card = $("fcCard");
+      if (!questions.length) {
+        $("fcText").textContent = "No flashcards yet.";
+        $("fcMeta").textContent = "";
+        $("fcCount").textContent = "";
+        $("fcHint").textContent = "Ask an admin to add questions.";
+        card.classList.remove("flipped");
+        return;
+      }
+      fcIndex = (fcIndex + questions.length) % questions.length;
+      const q = questions[fcIndex];
+      $("fcMeta").textContent = q.exam + " · " + q.subject;
+      $("fcCount").textContent = (fcIndex + 1) + " / " + questions.length;
+      card.classList.toggle("flipped", fcFlip);
+      if (!fcFlip) {
+        $("fcText").textContent = q.question;
+        $("fcHint").textContent = "Tap the card to reveal the answer.";
+      } else {
+        $("fcText").textContent = String.fromCharCode(65 + q.correct) + ". " + q.options[q.correct];
+        $("fcHint").textContent = q.exp;
+      }
+    }
+    function renderAdmin() {
+      const filter = $("qFilter").value || "ALL";
+      const list = $("qList");
+      list.replaceChildren();
+      questions.filter((q) => filter === "ALL" || q.exam === filter).forEach((q) => {
+        const item = document.createElement("div");
+        item.className = "qitem";
+        const p = document.createElement("p");
+        p.textContent = q.exam + " · " + q.subject + " — " + q.question;
+        const actions = document.createElement("div");
+        actions.className = "mini";
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.textContent = "Edit";
+        edit.onclick = () => {
+          editId = q.id;
+          $("qExam").value = q.exam;
+          $("qSubject").value = q.subject;
+          $("qText").value = q.question;
+          ["q0", "q1", "q2", "q3"].forEach((id, i) => $(id).value = q.options[i]);
+          $("qCorrect").value = String(q.correct);
+          $("qExp").value = q.exp;
+          $("qHeading").textContent = "Edit question";
+          $("qCancel").classList.remove("hidden");
+          $("qForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "danger";
+        del.textContent = "Delete";
+        del.onclick = () => {
+          if (!confirm("Delete this question?")) return;
+          questions = questions.filter((item) => item.id !== q.id);
+          save("questionsDatabase", questions);
+          renderAdmin();
+        };
+        actions.append(edit, del);
+        item.append(p, actions);
+        list.append(item);
+      });
+      if (!list.childElementCount) {
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.textContent = "No questions in this filter.";
+        list.append(empty);
+      }
+      const ad = Object.assign({}, DEFAULT_AD, load("adConfig", DEFAULT_AD));
+      $("adBadgeIn").value = ad.badge;
+      $("adTextIn").value = ad.text;
+      $("adBtnIn").value = ad.btnText;
+      $("adMsgIn").value = ad.actionMsg;
+      $("adTheme").value = ad.theme || "emerald";
+      $("adVisible").checked = ad.visible !== false;
+    }
+    function renderProfile() {
+      $("profTitle").textContent = session.name || "Profile";
+      $("profRole").textContent = session.role === "admin" ? "Administrator" : "Student";
+      $("pName").value = session.name || "";
+      $("pEmail").value = session.email || "";
+      $("pExamWrap").classList.toggle("hidden", session.role !== "student");
+      if (session.targetExam) $("pExam").value = session.targetExam;
+    }
+    function setSignup(on) {
+      signup = on;
+      $("subSignup").classList.toggle("on", on);
+      $("subLogin").classList.toggle("on", !on);
+      $("nameWrap").classList.toggle("hidden", !on);
+      $("examWrap").classList.toggle("hidden", !on);
+      $("sSubmit").textContent = on ? "Create account" : "Log in";
+      $("sPass").autocomplete = on ? "new-password" : "current-password";
+    }
+    function boot() {
+      if (load("theme", "light") === "dark") document.documentElement.classList.add("dark");
+      $("themeBtn").textContent = document.documentElement.classList.contains("dark") ? "☀" : "☾";
+      ["sExam", "qExam", "pExam"].forEach((id) => fillSelect($(id), false));
+      fillSelect($("qFilter"), true);
+      questions = load("questionsDatabase", null);
+      if (!Array.isArray(questions)) questions = SEED.slice();
+      session = load("currentUser", null);
+      renderBanner();
+      if (session && session.email) show(session.role === "admin" ? "admin" : "dashboard");
+      else show("auth");
+    }
+
+    $("themeBtn").onclick = () => {
+      document.documentElement.classList.toggle("dark");
+      const dark = document.documentElement.classList.contains("dark");
+      save("theme", dark ? "dark" : "light");
+      $("themeBtn").textContent = dark ? "☀" : "☾";
+    };
+    $("homeBtn").onclick = goHome;
+    $("tabStudent").onclick = () => { $("tabStudent").classList.add("on"); $("tabAdmin").classList.remove("on"); $("studentForm").classList.remove("hidden"); $("adminForm").classList.add("hidden"); };
+    $("tabAdmin").onclick = () => { $("tabAdmin").classList.add("on"); $("tabStudent").classList.remove("on"); $("adminForm").classList.remove("hidden"); $("studentForm").classList.add("hidden"); };
+    $("subLogin").onclick = () => setSignup(false);
+    $("subSignup").onclick = () => setSignup(true);
+    $("studentForm").onsubmit = (event) => {
+      event.preventDefault();
+      const email = $("sEmail").value.trim().toLowerCase();
+      const password = $("sPass").value;
+      const users = load("users", []);
+      if (signup) {
+        const name = $("sName").value.trim();
+        if (name.length < 2) return toast("Enter your name.", "error");
+        if (password.length < 6) return toast("Use at least 6 characters.", "error");
+        if (users.some((user) => user.email === email)) return toast("That email is already registered.", "error");
+        const user = { name, email, passwordHash: sha256(password), role: "student", targetExam: $("sExam").value };
+        users.push(user);
+        if (!save("users", users)) return;
+        session = { name, email, role: "student", targetExam: user.targetExam };
+        save("currentUser", session);
+        toast("Account created.", "success");
+        show("dashboard");
+        return;
+      }
+      const hash = sha256(password);
+      const user = users.find((item) => item.email === email && item.passwordHash === hash);
+      if (!user) return toast("Email or password is wrong.", "error");
+      session = { name: user.name, email: user.email, role: "student", targetExam: user.targetExam };
+      save("currentUser", session);
+      toast("Welcome back.", "success");
+      show("dashboard");
+    };
+    $("adminForm").onsubmit = (event) => {
+      event.preventDefault();
+      const email = $("aEmail").value.trim().toLowerCase();
+      if (email === ADMIN_EMAIL && sha256($("aPass").value) === ADMIN_HASH) {
+        session = { name: "Master Admin", email, role: "admin" };
+        save("currentUser", session);
+        toast("Admin verified.", "success");
+        show("admin");
+      } else toast("Admin email or password is wrong.", "error");
+    };
+    $("logoutBtn").onclick = () => {
+      stopTimer();
+      session = null;
+      localStorage.removeItem("currentUser");
+      quiz = null;
+      toast("Logged out.");
+      show("auth");
+    };
+    function leaveQuiz(next) {
+      if (quiz && !submitted && quiz.list.length && !confirm("Leave this test? It will not be saved.")) return;
+      stopTimer();
+      quiz = null;
+      submitted = false;
+      show(next);
+    }
+    $("navHome").onclick = () => leaveQuiz("dashboard");
+    $("navCards").onclick = () => { if (quiz && !submitted && quiz.list.length && !confirm("Leave this test? It will not be saved.")) return; stopTimer(); quiz = null; submitted = false; fcFlip = false; show("cards"); };
+    $("navAdmin").onclick = () => { if (session && session.role === "admin") leaveQuiz("admin"); };
+    $("navProfile").onclick = () => leaveQuiz("profile");
+    $("prevQ").onclick = () => { if (quiz && quiz.index > 0) { quiz.index--; renderQuestion(); } };
+    $("nextQ").onclick = () => { if (quiz && quiz.index < quiz.list.length - 1) { quiz.index++; renderQuestion(); } };
+    $("submitQuiz").onclick = () => {
+      if (!quiz || submitted) return;
+      const missed = quiz.list.filter((_, index) => quiz.answers[index] == null).length;
+      if (missed && !confirm(missed + " question" + (missed > 1 ? "s are" : " is") + " unanswered. Submit anyway?")) return;
+      finishQuiz();
+    };
+    $("quitQuiz").onclick = () => {
+      if (!confirm("Quit this test? It will not be saved.")) return;
+      stopTimer();
+      quiz = null;
+      submitted = false;
+      show("dashboard");
+    };
+    $("fcCard").onclick = () => { fcFlip = !fcFlip; renderCard(); };
+    $("fcPrev").onclick = () => { fcIndex--; fcFlip = false; renderCard(); };
+    $("fcNext").onclick = () => { fcIndex++; fcFlip = false; renderCard(); };
+    $("qFilter").onchange = renderAdmin;
+    $("qCancel").onclick = () => { editId = ""; $("qForm").reset(); $("qHeading").textContent = "Add question"; $("qCancel").classList.add("hidden"); };
+    $("qForm").onsubmit = (event) => {
+      event.preventDefault();
+      const next = {
+        id: editId || ("q_" + Date.now()),
+        exam: $("qExam").value,
+        subject: $("qSubject").value.trim(),
+        question: $("qText").value.trim(),
+        options: [$("q0").value.trim(), $("q1").value.trim(), $("q2").value.trim(), $("q3").value.trim()],
+        correct: Number($("qCorrect").value),
+        exp: $("qExp").value.trim()
+      };
+      if (editId) questions = questions.map((q) => q.id === editId ? next : q);
+      else questions.push(next);
+      save("questionsDatabase", questions);
+      editId = "";
+      $("qForm").reset();
+      $("qHeading").textContent = "Add question";
+      $("qCancel").classList.add("hidden");
+      toast("Question saved.", "success");
+      renderAdmin();
+    };
+    $("admQ").onclick = () => { $("admQ").classList.add("on"); $("admA").classList.remove("on"); $("qForm").classList.remove("hidden"); $("qList").parentElement.classList.remove("hidden"); $("adForm").classList.add("hidden"); };
+    $("admA").onclick = () => { $("admA").classList.add("on"); $("admQ").classList.remove("on"); $("qForm").classList.add("hidden"); $("qList").parentElement.classList.add("hidden"); $("adForm").classList.remove("hidden"); renderAdmin(); };
+    $("adForm").onsubmit = (event) => {
+      event.preventDefault();
+      save("adConfig", { badge: $("adBadgeIn").value.trim(), text: $("adTextIn").value.trim(), btnText: $("adBtnIn").value.trim(), actionMsg: $("adMsgIn").value.trim(), theme: $("adTheme").value, visible: $("adVisible").checked });
+      sessionStorage.removeItem("adDismissed");
+      renderBanner();
+      toast("Banner saved.", "success");
+    };
+    $("adClose").onclick = () => { sessionStorage.setItem("adDismissed", "1"); renderBanner(); };
+    $("profForm").onsubmit = (event) => {
+      event.preventDefault();
+      session.name = $("pName").value.trim();
+      if (session.role === "student") {
+        session.targetExam = $("pExam").value;
+        const users = load("users", []);
+        const index = users.findIndex((user) => user.email === session.email);
+        if (index >= 0) { users[index].name = session.name; users[index].targetExam = session.targetExam; save("users", users); }
+      }
+      save("currentUser", session);
+      toast("Profile saved.", "success");
+      renderProfile();
+    };
+    boot();
+  </script>
+</body>
+</html>
